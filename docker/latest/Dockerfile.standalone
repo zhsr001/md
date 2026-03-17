@@ -18,5 +18,7 @@ RUN go build -ldflags "-w -s" -o md main.go && \
 FROM --platform=$TARGETPLATFORM "alpine:$VER_ALPINE"
 LABEL MAINTAINER="ylb<contact@yanglibin.info>"
 COPY --from=gobuilder /app/md.minify /bin/md
+RUN mkdir -p /data/storage /data/upload
+VOLUME /data
 EXPOSE 80
 CMD ["md"]

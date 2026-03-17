@@ -4,6 +4,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 
 import { setupComponents } from './utils/setup-components'
+import { detectAndSetupStorageEngine } from './utils/storage'
 
 import 'vue-sonner/style.css'
 
@@ -16,8 +17,9 @@ initializeMermaid().catch(console.error)
 
 setupComponents()
 
-const app = createApp(App)
-
-app.use(createPinia())
-
-app.mount(`#app`)
+// 检测服务器模式并切换存储引擎，然后再挂载应用
+detectAndSetupStorageEngine().then(() => {
+  const app = createApp(App)
+  app.use(createPinia())
+  app.mount(`#app`)
+})

@@ -1,0 +1,11 @@
+# Docker Compose - Standalone with persistent storage
+# All data (posts, styles, themes, uploads) persists to ./md-data/
+
+services:
+  md:
+    image: doocs/md:latest-standalone
+    ports:
+      - "8080:80"
+    volumes:
+      - ./md-data:/data
+    restart: unless-stopped

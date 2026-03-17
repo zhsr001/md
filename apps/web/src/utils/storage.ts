@@ -108,6 +108,10 @@ export class RestfulStorageEngine implements StorageEngine {
       throw new Error(`Storage API error: ${response.statusText}`)
     }
 
+    if (method === `HEAD`) {
+      return null
+    }
+
     return response.json()
   }
 
@@ -360,3 +364,23 @@ class StorageManager {
  * 全局存储实例 - 统一通过 store.xxx 调用
  */
 export const store = new StorageManager()
+
+/**
+ * 检测是否运行在支持 RESTful 存储的服务器模式下（如 Docker standalone）
+ * 如果检测到服务端 API，自动切换存储引擎到 RestfulStorageEngine
+ */
+export async function detectAndSetupStorageEngine(): Promise<void> {
+  try {
+    const response = await fetch(`/api/health`, { method: `GET` })
+    if (response.ok) {
+      const data = await response.json()
+      if (data.status === `ok`) {
+        console.info(`[Storage] Server mode detected, switching to RestfulStorageEngine`)
+        store.setEngine(new RestfulStorageEngine(`/api`))
+      }
+    }
+  }
+  catch {
+    // Not in server mode, keep using LocalStorageEngine
+  }
+}
